@@ -374,7 +374,13 @@ static Txid SignAndCommit(CWallet& wallet, CMutableTransaction& mtx, const std::
         }
     }
     std::map<int, bilingual_str> input_errors;
-    wallet.SignTransaction(mtx, coins, SIGHASH_DEFAULT, input_errors);
+    {
+        // cs_wallet before the keys' own lock, as every signer of the wallet takes them: an encrypted wallet's key manager
+        // asks the wallet whether it is locked (cs_wallet) while holding its own lock, so signing without cs_wallet
+        // deadlocked against any reader of the wallet (IsMine holds cs_wallet, then the manager's lock).
+        LOCK(wallet.cs_wallet);
+        wallet.SignTransaction(mtx, coins, SIGHASH_DEFAULT, input_errors);
+    }
     for (unsigned int i{0}; i < mtx.vin.size(); ++i) {
         if (external.contains(mtx.vin[i].prevout)) {
             // Anyone can spend an escrow output at the script level, with nothing in the scriptSig.

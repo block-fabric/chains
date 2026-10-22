@@ -321,6 +321,7 @@ BASE_SCRIPTS = [
     'p2p_bip434_feature.py',
     'p2p_bip434_feature.py --v2transport',
     'wallet_encryption.py',
+    'wallet_drivechain_encrypted.py',
     'feature_dersig.py',
     'feature_reindex_init.py',
     'feature_cltv.py',
